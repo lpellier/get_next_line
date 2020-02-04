@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lpellier <lpellier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/19 10:49:49 by lpellier          #+#    #+#             */
-/*   Updated: 2020/02/04 10:02:31 by lpellier         ###   ########.fr       */
+/*   Updated: 2020/02/04 10:28:19 by lpellier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ int		get_next_line(int fd, char **line)
 {
 	int			ret;
 	int			i;
-	static char	*stock = NULL;
+	static char	*stock[1024];
 	char		buf[BUFFER_SIZE + 1];
 
 	if (!(fd >= 0 && BUFFER_SIZE > 0 && line != NULL && !read(fd, buf, 0)))
@@ -81,14 +81,14 @@ int		get_next_line(int fd, char **line)
 	while ((ret = read(fd, buf, BUFFER_SIZE)))
 	{
 		buf[ret] = '\0';
-		stock = init_stock(stock, buf);
-		if ((i = append_and_update(&stock, line)))
+		stock[fd] = init_stock(stock[fd], buf);
+		if ((i = append_and_update(&stock[fd], line)))
 			return (1);
 	}
-	if ((i = append_and_update(&stock, line)))
+	if ((i = append_and_update(&stock[fd], line)))
 		return (1);
-	*line = line_def(stock, i - 1);
-	free(stock);
-	stock = NULL;
+	*line = line_def(stock[fd], i - 1);
+	free(stock[fd]);
+	stock[fd] = NULL;
 	return (0);
 }
